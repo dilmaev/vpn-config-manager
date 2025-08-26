@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../../../.env') });
 const axios = require('axios');
 const https = require('https');
 const { v4: uuidv4 } = require('uuid');
