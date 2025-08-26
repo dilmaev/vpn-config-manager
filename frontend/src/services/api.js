@@ -30,6 +30,11 @@ export const clientAPI = {
     return response.data;
   },
 
+  regenerate: async (name) => {
+    const response = await api.post(`/clients/${name}/regenerate`);
+    return response.data;
+  },
+
   getServerStatus: async () => {
     const response = await api.get('/clients/status/servers');
     return response.data;

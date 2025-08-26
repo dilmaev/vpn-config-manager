@@ -27,6 +27,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import LinkIcon from '@mui/icons-material/Link';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
+import UpdateIcon from '@mui/icons-material/Update';
 import { clientAPI } from '../services/api';
 
 function ClientList() {
@@ -35,6 +36,7 @@ function ClientList() {
   const [error, setError] = useState('');
   const [deleteDialog, setDeleteDialog] = useState({ open: false, client: null });
   const [searchTerm, setSearchTerm] = useState('');
+  const [regenerating, setRegenerating] = useState({});
 
   const fetchClients = async () => {
     setLoading(true);
@@ -68,6 +70,26 @@ function ClientList() {
       }
     } catch (err) {
       setError('Error deleting client');
+    }
+  };
+
+  const handleRegenerate = async (client) => {
+    setRegenerating(prev => ({ ...prev, [client.name]: true }));
+    try {
+      const response = await clientAPI.regenerate(client.name);
+      if (response.success) {
+        // Show success message
+        setError('');
+        alert(`Config regenerated successfully for ${client.name}`);
+        // Refresh the list to get updated URLs
+        await fetchClients();
+      } else {
+        setError(`Failed to regenerate config for ${client.name}`);
+      }
+    } catch (err) {
+      setError(`Error regenerating config: ${err.message}`);
+    } finally {
+      setRegenerating(prev => ({ ...prev, [client.name]: false }));
     }
   };
 
@@ -205,6 +227,16 @@ function ClientList() {
                         onClick={() => downloadConfig(client)}
                       >
                         <DownloadIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Regenerate Config">
+                      <IconButton
+                        size="small"
+                        color="warning"
+                        onClick={() => handleRegenerate(client)}
+                        disabled={regenerating[client.name]}
+                      >
+                        <UpdateIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete Client">

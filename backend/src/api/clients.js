@@ -130,6 +130,80 @@ router.get('/:name', async (req, res) => {
   }
 });
 
+router.post('/:name/regenerate', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const client = await db.getClient(name);
+
+    if (!client) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+    }
+
+    console.log(`Regenerating config for client: ${name}`);
+    
+    // Get current client data from 3x-ui servers
+    const clientsData = await xuiApi.getClients();
+    
+    // Find client UUIDs
+    const moscowClient = clientsData.moscow.find(c => c.uuid === client.moscow_uuid);
+    const germanyClient = clientsData.germany.find(c => c.uuid === client.germany_uuid);
+    
+    if (!moscowClient || !germanyClient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found on 3x-ui servers'
+      });
+    }
+
+    // Prepare data for config generation
+    const moscowData = {
+      uuid: client.moscow_uuid,
+      server: 'moscow.grozny.site',
+      port: 443,
+      publicKey: 'ZF6AAUCvUjIn8tI5CPqeJc8rnFzrjxFeIJYEoMsYgEY',
+      shortId: '3b'
+    };
+
+    const germanyData = {
+      uuid: client.germany_uuid,
+      server: 'de.grozny.site',
+      port: 443,
+      publicKey: 'KibMR-hE7jasSqY7zJAoajwufXRoiy5ucVAQaZmZBB4',
+      shortId: 'd1594c7994a38c88'
+    };
+
+    // Generate new config with updated templates
+    const config = configGenerator.generateConfig(
+      client.platform,
+      moscowData,
+      germanyData
+    );
+
+    // Save updated config
+    const savedConfig = await configGenerator.saveConfig(name, client.platform, config);
+
+    res.json({
+      success: true,
+      message: 'Config regenerated successfully',
+      data: {
+        name,
+        platform: client.platform,
+        configUrl: savedConfig.publicUrl,
+        directUrl: `https://config.test-internet.ru/${savedConfig.fileName}`
+      }
+    });
+  } catch (error) {
+    console.error('Error regenerating config:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to regenerate config'
+    });
+  }
+});
+
 router.delete('/:name', async (req, res) => {
   try {
     const { name } = req.params;
