@@ -203,7 +203,7 @@ function createMoscowOutbound(moscowData) {
 }
 
 function createGermanyOutbound(germanyData, moscowData) {
-  // Germany server - direct connection, no detour
+  // Germany server - connect through Moscow (detour) because direct access from Russia is blocked
   return {
     type: "vless",
     tag: "de-hetzner",
@@ -224,7 +224,8 @@ function createGermanyOutbound(germanyData, moscowData) {
         public_key: germanyData.publicKey,
         short_id: germanyData.shortId
       }
-    }
+    },
+    detour: "moscow-ali"  // Connect to Germany through Moscow proxy
   };
 }
 
