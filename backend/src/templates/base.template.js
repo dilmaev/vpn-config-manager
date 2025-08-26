@@ -130,7 +130,11 @@ const baseTemplate = {
           "byteintlapi.com",
           "ahrefs.com",
           "speedtest.net",
-          "2ip.ru"
+          "moz.com",
+          "2ip.ru",
+          "whatismyipaddress.com",
+          "ifconfig.me",
+          "ipinfo.io"
         ],
         rule_set: [
           "openai",
