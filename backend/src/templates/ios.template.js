@@ -1,6 +1,8 @@
 const { baseTemplate, createMoscowOutbound, createGermanyOutbound } = require('./base.template');
 
 function generateIosConfig(moscowData, germanyData) {
+  const germanyOutbounds = createGermanyOutbound(germanyData, moscowData);
+  
   return {
     log: {
       level: "info",
@@ -35,7 +37,7 @@ function generateIosConfig(moscowData, germanyData) {
     outbounds: [
       ...baseTemplate.outbounds,
       createMoscowOutbound(moscowData),
-      createGermanyOutbound(germanyData)
+      ...(Array.isArray(germanyOutbounds) ? germanyOutbounds : [germanyOutbounds])
     ],
     route: baseTemplate.route,
     inbounds: [

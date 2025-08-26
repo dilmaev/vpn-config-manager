@@ -1,6 +1,8 @@
 const { baseTemplate, createMoscowOutbound, createGermanyOutbound } = require('./base.template');
 
 function generateWindowsConfig(moscowData, germanyData) {
+  const germanyOutbounds = createGermanyOutbound(germanyData, moscowData);
+  
   return {
     ...baseTemplate,
     inbounds: [
@@ -15,7 +17,7 @@ function generateWindowsConfig(moscowData, germanyData) {
     outbounds: [
       ...baseTemplate.outbounds,
       createMoscowOutbound(moscowData),
-      createGermanyOutbound(germanyData)
+      ...(Array.isArray(germanyOutbounds) ? germanyOutbounds : [germanyOutbounds])
     ]
   };
 }

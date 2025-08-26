@@ -1,6 +1,8 @@
 const { baseTemplate, createMoscowOutbound, createGermanyOutbound } = require('./base.template');
 
 function generateAndroidConfig(moscowData, germanyData) {
+  const germanyOutbounds = createGermanyOutbound(germanyData, moscowData);
+  
   return {
     ...baseTemplate,
     log: {
@@ -44,7 +46,7 @@ function generateAndroidConfig(moscowData, germanyData) {
     outbounds: [
       ...baseTemplate.outbounds,
       createMoscowOutbound(moscowData),
-      createGermanyOutbound(germanyData)
+      ...(Array.isArray(germanyOutbounds) ? germanyOutbounds : [germanyOutbounds])
     ],
     route: {
       ...baseTemplate.route,
