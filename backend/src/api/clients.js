@@ -133,25 +133,35 @@ router.get('/:name', async (req, res) => {
 router.post('/:name/regenerate', async (req, res) => {
   try {
     const { name } = req.params;
-    const client = await db.getClient(name);
-
-    if (!client) {
-      return res.status(404).json({
-        success: false,
-        message: 'Client not found'
-      });
-    }
-
     console.log(`Regenerating config for client: ${name}`);
     
+    const client = await db.getClient(name);
+    console.log('Client from DB:', client);
+
+    if (!client) {
+      console.log('Client not found in database');
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found in database'
+      });
+    }
+    
     // Get current client data from 3x-ui servers
+    console.log('Fetching clients from 3x-ui servers...');
     const clientsData = await xuiApi.getClients();
     
     // Find client UUIDs
+    console.log('Looking for Moscow UUID:', client.moscow_uuid);
+    console.log('Looking for Germany UUID:', client.germany_uuid);
+    
     const moscowClient = clientsData.moscow.find(c => c.uuid === client.moscow_uuid);
     const germanyClient = clientsData.germany.find(c => c.uuid === client.germany_uuid);
     
+    console.log('Moscow client found:', !!moscowClient);
+    console.log('Germany client found:', !!germanyClient);
+    
     if (!moscowClient || !germanyClient) {
+      console.log('Client not found on 3x-ui servers');
       return res.status(404).json({
         success: false,
         message: 'Client not found on 3x-ui servers'
@@ -176,6 +186,7 @@ router.post('/:name/regenerate', async (req, res) => {
     };
 
     // Generate new config with updated templates
+    console.log('Generating new config...');
     const config = configGenerator.generateConfig(
       client.platform,
       moscowData,
@@ -183,7 +194,9 @@ router.post('/:name/regenerate', async (req, res) => {
     );
 
     // Save updated config
+    console.log('Saving config...');
     const savedConfig = await configGenerator.saveConfig(name, client.platform, config);
+    console.log('Config saved:', savedConfig);
 
     res.json({
       success: true,
@@ -197,6 +210,7 @@ router.post('/:name/regenerate', async (req, res) => {
     });
   } catch (error) {
     console.error('Error regenerating config:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to regenerate config'
