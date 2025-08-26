@@ -203,38 +203,29 @@ function createMoscowOutbound(moscowData) {
 }
 
 function createGermanyOutbound(germanyData, moscowData) {
-  // Create two separate outbounds for the chain
-  return [
-    {
-      type: "vless",
-      tag: "de-hetzner-server",
-      server: germanyData.server,
-      server_port: germanyData.port,
-      uuid: germanyData.uuid,
-      flow: "xtls-rprx-vision",
-      tls: {
+  // Germany server - direct connection, no detour
+  return {
+    type: "vless",
+    tag: "de-hetzner",
+    server: germanyData.server,
+    server_port: germanyData.port,
+    uuid: germanyData.uuid,
+    flow: "xtls-rprx-vision",
+    tls: {
+      enabled: true,
+      server_name: "vk.ru",
+      alpn: ["h2", "http/1.1"],
+      utls: {
         enabled: true,
-        server_name: "vk.ru",
-        alpn: ["h2", "http/1.1"],
-        utls: {
-          enabled: true,
-          fingerprint: "chrome"
-        },
-        reality: {
-          enabled: true,
-          public_key: germanyData.publicKey,
-          short_id: germanyData.shortId
-        }
+        fingerprint: "chrome"
       },
-      detour: "moscow-ali"  // Route through Moscow first
-    },
-    {
-      type: "selector",
-      tag: "de-hetzner",
-      outbounds: ["de-hetzner-server"],
-      default: "de-hetzner-server"
+      reality: {
+        enabled: true,
+        public_key: germanyData.publicKey,
+        short_id: germanyData.shortId
+      }
     }
-  ];
+  };
 }
 
 module.exports = {
