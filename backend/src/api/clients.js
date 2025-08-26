@@ -122,12 +122,12 @@ router.post('/:name/regenerate', async (req, res) => {
     console.log('Fetching clients from 3x-ui servers...');
     const clientsData = await xuiApi.getClients();
     
-    // Find client UUIDs
+    // Find client UUIDs (3x-ui uses 'id' field for UUID)
     console.log('Looking for Moscow UUID:', client.moscow_uuid);
     console.log('Looking for Germany UUID:', client.germany_uuid);
     
-    const moscowClient = clientsData.moscow.find(c => c.uuid === client.moscow_uuid);
-    const germanyClient = clientsData.germany.find(c => c.uuid === client.germany_uuid);
+    const moscowClient = clientsData.moscow.find(c => (c.id || c.uuid) === client.moscow_uuid);
+    const germanyClient = clientsData.germany.find(c => (c.id || c.uuid) === client.germany_uuid);
     
     console.log('Moscow client found:', !!moscowClient);
     console.log('Germany client found:', !!germanyClient);
