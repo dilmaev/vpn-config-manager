@@ -169,9 +169,27 @@ class XUIApiService {
         this.germanyApi.get('/panel/api/inbounds/list')
       ]);
 
+      // Extract clients from inbound settings
+      const extractClients = (inbounds) => {
+        const clients = [];
+        if (inbounds && inbounds.length > 0) {
+          for (const inbound of inbounds) {
+            if (inbound.settings) {
+              const settings = typeof inbound.settings === 'string' 
+                ? JSON.parse(inbound.settings) 
+                : inbound.settings;
+              if (settings.clients && Array.isArray(settings.clients)) {
+                clients.push(...settings.clients);
+              }
+            }
+          }
+        }
+        return clients;
+      };
+
       return {
-        moscow: moscowResponse.data.obj || [],
-        germany: germanyResponse.data.obj || []
+        moscow: extractClients(moscowResponse.data.obj),
+        germany: extractClients(germanyResponse.data.obj)
       };
     } catch (error) {
       console.error('Error fetching clients:', error);
