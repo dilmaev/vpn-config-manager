@@ -102,34 +102,6 @@ router.get('/list', async (req, res) => {
   }
 });
 
-router.get('/:name', async (req, res) => {
-  try {
-    const { name } = req.params;
-    const client = await db.getClient(name);
-
-    if (!client) {
-      return res.status(404).json({
-        success: false,
-        message: 'Client not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: {
-        ...client,
-        directUrl: `https://config.test-internet.ru/${client.config_file}`
-      }
-    });
-  } catch (error) {
-    console.error('Error getting client:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to get client'
-    });
-  }
-});
-
 router.post('/:name/regenerate', async (req, res) => {
   try {
     const { name } = req.params;
@@ -214,6 +186,34 @@ router.post('/:name/regenerate', async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to regenerate config'
+    });
+  }
+});
+
+router.get('/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const client = await db.getClient(name);
+
+    if (!client) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...client,
+        directUrl: `https://config.test-internet.ru/${client.config_file}`
+      }
+    });
+  } catch (error) {
+    console.error('Error getting client:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to get client'
     });
   }
 });
