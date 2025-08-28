@@ -102,13 +102,15 @@ const baseTemplate = {
         url: "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/whatsapp.srs"
       }
     ],
+    auto_detect_interface: true,
     rules: [
       {
-        action: "sniff"
+        action: "sniff",
+        sniffer: ["dns"]
       },
       {
-        protocol: "dns",
-        action: "hijack-dns"
+        action: "hijack-dns",
+        protocol: ["dns"]
       },
       {
         action: "route",
@@ -131,10 +133,7 @@ const baseTemplate = {
           "ahrefs.com",
           "speedtest.net",
           "moz.com",
-          "2ip.ru",
-          "whatismyipaddress.com",
-          "ifconfig.me",
-          "ipinfo.io"
+          "2ip.ru"
         ],
         rule_set: [
           "openai",
@@ -169,7 +168,7 @@ const baseTemplate = {
       },
       {
         action: "route",
-        outbound: "moscow-ali"
+        outbound: "de-hetzner"
       }
     ]
   },
